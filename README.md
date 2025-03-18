@@ -102,3 +102,58 @@ project/
 ---
 
 **NeuroPredict** is dedicated to advancing medical diagnostics using cutting-edge AI techniques, ensuring explainability, ethics, and compliance with data privacy standards.
+
+## FastAPI Hello World Application
+
+A simple FastAPI Hello World application is included in the `api` directory.
+
+### Running the FastAPI Application
+
+#### Without Docker
+
+1. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. Run the FastAPI application:
+   ```bash
+   cd api
+   uvicorn app:app --reload
+   ```
+
+3. Access the API at:
+   - Main endpoint: http://localhost:8000/
+   - Hello endpoint: http://localhost:8000/hello/{name}
+   - API documentation: http://localhost:8000/docs
+
+#### With Docker
+
+1. Build and start the Docker container:
+   ```bash
+   docker-compose up --build
+   ```
+
+2. Access the API at:
+   - Main endpoint: http://localhost:8000/
+   - Hello endpoint: http://localhost:8000/hello/{name}
+   - API documentation: http://localhost:8000/docs
+
+3. To stop the container:
+   ```bash
+   docker-compose down
+   ```
+
+### Building the Docker Image Manually
+
+If you prefer to build and run the Docker image without docker-compose:
+
+1. Build the Docker image:
+   ```bash
+   docker build -t fastapi-hello-world .
+   ```
+
+2. Run the Docker container:
+   ```bash
+   docker run -p 8000:8000 fastapi-hello-world
+   ```
