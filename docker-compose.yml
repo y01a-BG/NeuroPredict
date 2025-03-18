@@ -2,11 +2,27 @@ version: '3'
 
 services:
   api:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8000:8080"
     volumes:
       - ./api:/app/api
     environment:
       - ENVIRONMENT=development
-    restart: unless-stopped 
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./frontend:/app/frontend
+    environment:
+      - ENVIRONMENT=development
+    depends_on:
+      - api
+    restart: unless-stopped

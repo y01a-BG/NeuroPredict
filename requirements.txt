@@ -1,2 +1,19 @@
+# FastAPI application dependencies
 fastapi==0.110.0
-uvicorn==0.27.1 
+uvicorn==0.27.1
+starlette==0.36.3
+pydantic==2.10.6
+
+# Frontend dependencies
+streamlit==1.31.0
+requests==2.31.0
+
+# Python standard library packages used
+# os - included in Python standard library
+
+# Additional dependencies for the notebooks (optional for production)
+# Uncomment if needed for development environment
+# pandas==2.2.0
+# numpy==1.24.3
+# matplotlib==3.8.2
+# seaborn==0.13.0 
