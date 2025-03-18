@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project aims to develop a machine learning classification model to predict the presence of tumors and seizure occurrences based on EEG (electroencephalogram) data. By leveraging advanced machine learning and deep learning techniques, the project seeks to create an accurate, ethical, and explainable predictive tool for clinical use.
+This project aims to develop a machine learning classification model to predict the presence of tumors and seizure occurrences based on EEG (electroencephalogram) data. By leveraging advanced machine learning and deep learning techniques, the project seeks to create an  explainable and predictive tool.
 
 ## Objective
 - Classify EEG signals into distinct medical states:
@@ -16,15 +16,16 @@ This project aims to develop a machine learning classification model to predict 
 The dataset used for this project is derived from the [Epileptic Seizure Recognition](https://www.kaggle.com/datasets/harunshimanto/epileptic-seizure-recognition/data) dataset provided on Kaggle.
 
 ### Data Description:
-- 500 subjects
+- 5 subjects
 - 4097 EEG data points per individual (23.5 seconds recording)
 - Data reshaped into 23 segments per individual (each chunk: 178 data points)
 - Labels:
-  - 1: Recording of seizure activity
-  - 2: EEG from tumor-affected areas
-  - 3: EEG from healthy areas adjacent to tumors
-  - 4: Healthy baseline (tumor patient)
-  - 5: Eyes open baseline (healthy patient)
+
+ - A: Eyes open baseline (healthy patient)  
+ - B: Eyes closed baseline (healthy patient) 
+ - C: EEG from healthy area adjacent to tumors ('Healthy Silent Stage')    
+ - D: EEG from tumor-affected areas ('Tumor Silent Stage') 
+ - E: Recording of seizure activity 
 
 ## Project Structure
 
