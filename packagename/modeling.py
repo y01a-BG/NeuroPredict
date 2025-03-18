@@ -22,6 +22,7 @@ y = data.y
 
 
 # classification on y-column
+y = y - 1  # Shift labels to start from 0
 y = to_categorical(y, num_classes=3)
 
 # Split the data into 80% train and 20% test, with random_state=42 for reproducibility
@@ -38,21 +39,23 @@ def initialize_model(input_shape: tuple) -> Model:
     Initialize the Neural Network with random weights
     """
 
-    model = Sequential([
-        LSTM(128, activation='relu', return_sequences=True, input_shape=input_shape),
-        LSTM(128, activation='relu', return_sequences=True),
-        LSTM(64, activation='relu', return_sequences=True),
-        LSTM(64, activation='relu'),
-        Dense(64, activation='relu'),
-        Dense(3, activation='softmax')
-    ])
+    model = Sequential()
+    model.add(LSTM(128, activation='relu', return_sequences=True, input_shape=(178,1)))
+    model.add(LSTM(128, activation='relu', return_sequences=True))
+    model.add(LSTM(64, activation='relu', return_sequences=True))
+    model.add(LSTM(64, activation='relu'))
+
+    model.add(Dense(64, activation='relu'))
+
+    model.add(Dense(3, activation='softmax'))
 
     print("✅ Model initialized")
 
     return model
 
+model = initialize_model((178,1))
 
-def compile_model(model: Model, learning_rate=0.0005) -> Model:
+def compile_model(model, learning_rate=0.0005) -> Model:
     """
     Compile the Neural Network
     """
@@ -63,6 +66,8 @@ def compile_model(model: Model, learning_rate=0.0005) -> Model:
 
     return model
 
+
+model = compile_model(model, learning_rate=0.0005)
 def train_model(
         model: Model,
         X: np.ndarray,
@@ -100,6 +105,15 @@ def train_model(
     return model, history
 
 
+model, history = train_model(model,
+                            np.array(X_train),np.array(y_train),
+                            batch_size=128,
+                            patience=1,
+                            validation_data=None, # overrides validation_split
+                            validation_split=0.2
+                            )
+
+'''
 def evaluate_model(
         model: Model,
         X: np.ndarray,
@@ -131,3 +145,4 @@ def evaluate_model(
     print(f"✅ Model evaluated, MAE: {round(mae, 2)}")
 
     return metrics
+'''
