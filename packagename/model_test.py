@@ -17,7 +17,7 @@ from tensorflow.keras import callbacks
 from tensorflow.keras.callbacks import EarlyStopping
 
 print('Just the beginning...')
-data = pd.read_csv("/home/jovana/code/y01a-BG/NeuroPredict/raw_data/Epileptic Seizure Recognition.csv")
+data = pd.read_csv("raw_data/Epileptic Seizure Recognition.csv")
 print(data.head())
 
 ############################################
