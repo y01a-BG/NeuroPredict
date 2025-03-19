@@ -17,7 +17,7 @@ from keras import callbacks
 from keras.callbacks import EarlyStopping
 
 print('Just the beginning...')
-data = pd.read_csv("/home/jovana/code/y01a-BG/NeuroPredict/raw_data/Epileptic Seizure Recognition.csv")
+data = pd.read_csv("./NeuroPredict/raw_data/Epileptic Seizure Recognition.csv")
 print(data.head())
 
 ############################################
@@ -45,6 +45,16 @@ y = to_categorical(y, num_classes=3)
 
 # Split the data into 80% train and 20% test, with random_state=42 for reproducibility
 X_train, X_test, y_train, y_test = train_test_split(X_pad, y, test_size=0.2, random_state=42)
+# Get 6 random rows from X_test and save as CSV
+random_indices = np.random.choice(X_test.shape[0], size=6, replace=False)
+X_test_sample = X_test[random_indices]
+
+# Reshape the data back to 2D (removing the last dimension) before saving
+X_test_sample_2d = X_test_sample.squeeze()
+
+# Convert to DataFrame and save
+sample_df = pd.DataFrame(X_test_sample_2d)
+sample_df.to_csv('test_samples.csv', index=False)
 
 
 
