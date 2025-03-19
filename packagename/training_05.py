@@ -1,4 +1,3 @@
-
 import os
 import pandas as pd
 import numpy as np
@@ -20,7 +19,7 @@ from typing import Tuple
 ####### Load train  data from processed_data   ####################
 ######################################################################
 
-input_path = "./NeuroPredict/processed_data"
+input_path = "./processed_data"
 X_train_file_name = "X_train.csv"
 y_train_file_name = "y_train.csv"
 X_train_file_path = os.path.join(input_path, X_train_file_name)
