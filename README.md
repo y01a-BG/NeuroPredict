@@ -103,13 +103,15 @@ project/
 
 **NeuroPredict** is dedicated to advancing medical diagnostics using cutting-edge AI techniques, ensuring explainability, ethics, and compliance with data privacy standards.
 
-## FastAPI Hello World Application
+## Project Components
+
+### FastAPI Hello World Application
 
 A simple FastAPI Hello World application is included in the `api` directory.
 
-### Running the FastAPI Application
+#### Running the FastAPI Application
 
-#### Without Docker
+##### Without Docker
 
 1. Install the required dependencies:
    ```bash
@@ -127,11 +129,11 @@ A simple FastAPI Hello World application is included in the `api` directory.
    - Hello endpoint: http://localhost:8000/hello/{name}
    - API documentation: http://localhost:8000/docs
 
-#### With Docker
+##### With Docker
 
 1. Build and start the Docker container:
    ```bash
-   docker-compose up --build
+   docker-compose up --build api
    ```
 
 2. Access the API at:
@@ -139,21 +141,44 @@ A simple FastAPI Hello World application is included in the `api` directory.
    - Hello endpoint: http://localhost:8000/hello/{name}
    - API documentation: http://localhost:8000/docs
 
-3. To stop the container:
+### Streamlit Frontend Application
+
+A simple Streamlit frontend application is included in the `frontend` directory.
+
+#### Running the Streamlit Application
+
+##### Without Docker
+
+1. Install the required dependencies:
    ```bash
-   docker-compose down
+   pip install -r requirements.txt
    ```
 
-### Building the Docker Image Manually
-
-If you prefer to build and run the Docker image without docker-compose:
-
-1. Build the Docker image:
+2. Run the Streamlit application:
    ```bash
-   docker build -t fastapi-hello-world .
+   streamlit run frontend/app.py
    ```
 
-2. Run the Docker container:
+3. Access the Streamlit app at:
+   - http://localhost:8501
+
+##### With Docker
+
+1. Build and start the Docker container:
    ```bash
-   docker run -p 8000:8000 fastapi-hello-world
+   docker-compose up --build frontend
    ```
+
+2. Access the Streamlit app at:
+   - http://localhost:8501
+
+### Running Both Services Together
+
+1. Build and start both the FastAPI and Streamlit containers:
+   ```bash
+   docker-compose up --build
+   ```
+
+2. Access the applications at:
+   - FastAPI: http://localhost:8000
+   - Streamlit: http://localhost:8501
