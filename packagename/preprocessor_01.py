@@ -2,8 +2,8 @@
 import pandas as pd
 import numpy as np
 
-#input_path = "./NeuroPredict/raw_data"
-#output_path = "./NeuroPredict/processed_data"
+#input_path = "./raw_data"
+#output_path = "./processed_data"
 #file_name = "Epileptic Seizure Recognition.csv"
 #file_path = os.path.join(input_path, file_name)
 
