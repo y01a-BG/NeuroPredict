@@ -8,13 +8,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 import tensorflow as tf
-from tensorflow.keras.utils import to_categorical
+from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.layers import LSTM, Dense, Dropout
-from tensorflow.keras import callbacks
-from tensorflow.keras.callbacks import EarlyStopping
+from keras.models import Sequential
+from keras.utils import to_categorical
+from keras.layers import LSTM, Dense, Dropout
+from keras import callbacks
+from keras.callbacks import EarlyStopping
 
 print('Just the beginning...')
 data = pd.read_csv("/home/jovana/code/y01a-BG/NeuroPredict/raw_data/Epileptic Seizure Recognition.csv")

@@ -1,32 +1,15 @@
-
-from preprocessor import clean_data
-import tensorflow as tf
-from keras.utils import to_categorical
-from keras.models import Sequential
-from keras.utils import to_categorical
-from keras.layers import LSTM, Dense, Dropout
-from keras.optimizers import Adam
-from keras import callbacks
-from keras.callbacks import EarlyStopping
-from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 
 
-data = pd.read_csv("../raw_data/Epileptic Seizure Recognition.csv")
-data = clean_data(data)
 
-X = data.drop(columns = 'y')
-X = np.expand_dims(X, axis=2)  # to be able to enter the LSTM model
-y = data.y
+import tensorflow as tf
+from keras.models import Sequential
+
+from keras.layers import LSTM, Dense, Dropout,BatchNormalization
+from keras.optimizers import Adam
 
 
-# classification on y-column
-y = y - 1  # Shift labels to start from 0
-y = to_categorical(y, num_classes=3)
-
-# Split the data into 80% train and 20% test, with random_state=42 for reproducibility
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 
 #####################################################
@@ -34,39 +17,48 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 #####################################################
 
 # input_shape = (178,1)
-def initialize_model(input_shape: tuple) -> Model:
+def initialize_model(input_shape: tuple):
     """
     Initialize the Neural Network with random weights
     """
 
     model = Sequential()
-    model.add(LSTM(128, activation='relu', return_sequences=True, input_shape=(178,1)))
-    model.add(LSTM(128, activation='relu', return_sequences=True))
-    model.add(LSTM(64, activation='relu', return_sequences=True))
-    model.add(LSTM(64, activation='relu'))
+    model.add(LSTM(128, activation='tanh', return_sequences=True, input_shape=(178,1)))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.3))
+
+    model.add(LSTM(128, activation='tanh', return_sequences=True))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.3))
+
+
+    model.add(LSTM(64, activation='tanh'))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.3))
 
     model.add(Dense(64, activation='relu'))
-
     model.add(Dense(3, activation='softmax'))
 
     print("✅ Model initialized")
 
     return model
 
-model = initialize_model((178,1))
 
-def compile_model(model, learning_rate=0.0005) -> Model:
+def compile_model(model, learning_rate=0.001):
     """
     Compile the Neural Network
     """
-    optimizer = optimizers.Adam(learning_rate=learning_rate) # 'rmsprop'
-    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=["accuracy"])
+    optimizer = Adam(learning_rate=learning_rate) # 'rmsprop'
+    model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=["accuracy"])
 
     print("✅ Model compiled")
 
     return model
 
+####################################
+#####################################
 
+'''
 model = compile_model(model, learning_rate=0.0005)
 def train_model(
         model: Model,
@@ -113,7 +105,7 @@ model, history = train_model(model,
                             validation_split=0.2
                             )
 
-'''
+
 def evaluate_model(
         model: Model,
         X: np.ndarray,
