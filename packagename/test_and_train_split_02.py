@@ -12,11 +12,11 @@ from sklearn.model_selection import train_test_split
 ####### Splitting into train/test here########################
 ######################################################################
 
-input_path = "/home/jovana/code/y01a-BG/NeuroPredict/raw_data"
+input_path = "./raw_data"
 file_name = "Epileptic Seizure Recognition.csv"
 file_path = os.path.join(input_path, file_name)
 
-output_path = "/home/jovana/code/y01a-BG/NeuroPredict/processed_data"
+output_path = "./processed_data"
 data_file = "data.csv"
 data_path = os.path.join(output_path, data_file)
 

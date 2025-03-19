@@ -11,7 +11,7 @@ from sklearn.metrics import classification_report
 ####### Load test  data from processed_data   ####################
 ######################################################################
 
-input_path = "/home/jovana/code/y01a-BG/NeuroPredict/processed_data"
+input_path = "./NeuroPredict/processed_data"
 X_test_file_name = "X_test.csv"
 y_test_file_name = "y_test.csv"
 X_test_file_path = os.path.join(input_path, X_test_file_name)
