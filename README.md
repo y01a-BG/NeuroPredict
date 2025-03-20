@@ -8,9 +8,7 @@ This project aims to develop a machine learning classification model to predict 
 - Classify EEG signals into distinct medical states:
   - Healthy baseline
   - Tumor baseline
-  - Tumor seizure
-  - Seizure vs. silent stage
-  - Healthy vs. tumor 'silent' stage
+  - Tumor-induced seizure
 
 ## Dataset
 The dataset used for this project is derived from the [Epileptic Seizure Recognition](https://www.kaggle.com/datasets/harunshimanto/epileptic-seizure-recognition/data) dataset provided on Kaggle.
@@ -30,74 +28,106 @@ The dataset used for this project is derived from the [Epileptic Seizure Recogni
 
 ```
 project/
-├── data/
-│   ├── raw/
-│   └── processed/
-├── notebooks/
-│   ├── exploration.ipynb
-│   ├── preprocessing.ipynb
-│   ├── feature_engineering.ipynb
-│   └── model_training.ipynb
-├── src/
-│   ├── data_processing.py
-│   ├── feature_engineering.py
-│   └── model.py
+├── api/
+│   ├── app.py         # FastAPI backend for EEG data processing and prediction
+│   └── fast.py        # Additional API functionality
+├── frontend/
+│   └── app.py         # Streamlit frontend for visualization
 ├── models/
-├── reports/
+│   └── LSTMmodel.h5   # Pre-trained LSTM neural network model
+├── packagename/
+│   └── encoding_03.py # Data preprocessing utilities
 └── README.md
 ```
 
-## Key Tasks & Methodology
+## Current Functionality
 
-### 1. Data Exploration & Preprocessing
-- Inspect and clean dataset
-- Exploratory Data Analysis (EDA)
-- Signal processing techniques: Fourier Transform, Wavelet Transform
+### Backend (FastAPI)
 
-## Feature Engineering
+The FastAPI backend provides an API for processing EEG data CSV files and making predictions using a pre-trained LSTM model:
 
-- Extraction of time-domain, frequency-domain, and statistical features
-- Dimensionality reduction (PCA, t-SNE, UMAP)
-- Feature selection (Mutual Information, LASSO, SHAP)
+- **CSV Upload Endpoint**: Accepts CSV files containing EEG data
+- **Data Preprocessing**: Automatically preprocesses uploaded data using the encoder_LSTM function
+- **Model Prediction**: Uses the pre-trained LSTM model to classify EEG signals
+- **Response**: Returns prediction results with classifications (healthy baseline, tumor baseline, or tumor-induced seizure)
 
-## Modeling
+### Frontend (Streamlit)
 
-### Algorithms
-- Logistic Regression
-- Support Vector Machines (SVM)
-- Decision Trees & Random Forest
-- XGBoost
-- Deep Learning (CNN, RNN, LSTM)
+The Streamlit frontend provides a user-friendly interface for:
 
-### Optimization
-- Hyperparameter tuning (GridSearchCV, Optuna, Hyperopt)
-- Evaluation metrics: accuracy, precision, recall, F1-score, AUC-ROC
+- **CSV File Upload**: Easy upload of EEG data files
+- **Data Preview**: Shows a preview of the uploaded data
+- **API Integration**: Automatically sends data to the FastAPI backend for processing
+- **EEG Signal Visualization**: Displays the first 6 rows of data as time-series plots
+- **Prediction Display**: Shows color-coded predictions below each EEG signal:
+  - Green: Healthy baseline EEG
+  - Yellow: Tumor baseline EEG
+  - Red: Tumor-induced seizure EEG
 
-## Evaluation & Explainability
+## Running the Application
 
-- Confusion matrix and classification report analysis
-- Model interpretability using SHAP, LIME, Integrated Gradients
-- Model calibration and confidence estimation
+### Prerequisites
 
-## Deployment & Monitoring
+- Python 3.8+
+- Required libraries (install using `pip install -r requirements.txt`):
+  - fastapi
+  - uvicorn
+  - streamlit
+  - pandas
+  - numpy
+  - matplotlib
+  - keras
+  - tensorflow
+  - python-multipart
+  - requests
 
-- Packaging (FastAPI, Docker, Flask)
-- Deployment (AWS, GCP, Azure)
-- Monitoring (MLflow, Prefect, Airflow)
+### Starting the Backend
 
-## Deliverables
+```bash
+cd api
+uvicorn app:app --reload
+```
 
-- Technical report and executive summary
-- Live demo using Streamlit
-- Comprehensive final presentation
+The API will be available at http://127.0.0.1:8000
+
+### Starting the Frontend
+
+```bash
+streamlit run frontend/app.py
+```
+
+The Streamlit interface will be available at http://127.0.0.1:8501
+
+### Using Docker
+
+If you prefer to use Docker:
+
+```bash
+docker-compose up --build
+```
+
+This will start both the backend and frontend services.
+
+## How to Use
+
+1. Open the Streamlit frontend at http://127.0.0.1:8501
+2. Enter the FastAPI URL (default: http://127.0.0.1:8000)
+3. Upload a CSV file containing EEG data
+4. View the data preview and wait for automatic processing
+5. Examine the EEG signal visualizations and corresponding predictions
+6. Each prediction is color-coded to indicate the classification type
+
+## Future Enhancements
+
+- Improve model accuracy with advanced feature engineering
+- Add more detailed visualization options for EEG data
+- Implement real-time EEG monitoring capabilities
+- Add explainability features to help interpret predictions
+- Expand classification capabilities to detect more neurological conditions
 
 ## References
 - Andrzejak et al., 2001. Indications of nonlinear deterministic and finite dimensional structures in brain activity.
 - Kode et al., 2024
-
-## Team & Contributions
-
-- Clearly document each team member's contributions to the phases and tasks of the project.
 
 ---
 
