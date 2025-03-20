@@ -26,10 +26,11 @@ def perform_random_search(xgb, X_train, y_train, X_test, y_test):
         random_state=42
     )
 
+
     random_search.fit(
         X_train,
         y_train,
-        eval_set=[(X_test, y_test)],
+        eval_set=[(X_train, y_train), (X_test, y_test)],
         verbose=True
     )
 
