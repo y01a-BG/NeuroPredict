@@ -17,6 +17,14 @@ model = load_model("models/LSTMmodel.h5")
 assert model is not None
 
 
+#Load the sample data (6 traces)
+input_path = "./processed_data"
+X_pred_file_name = "random_test_samples.csv"
+X_pred_file_path = os.path.join(input_path, X_pred_file_name)
+
+X_pred = pd.read_csv(X_pred_file_path)
+
+
 def pred(X_pred: pd.DataFrame = None) -> np.ndarray:
     """
     Make a prediction using the latest trained model.
@@ -41,17 +49,19 @@ async def make_prediction(input_data):
     X_pred = pd.DataFrame(input_data.data)
 
      # Call the prediction function
-    y_pred_label = pred(X_pred)
+    y_pred_labels = pred(X_pred)
 
-    # Mapping prediction to labels (you can customize this part as needed)
-    if y_pred_label == 0:
-        prediction_text = "Your EEG is predicted to be tumor-induced seizure EEG."
-    elif y_pred_label == 1:
-        prediction_text = "Your EEG is predicted to be tumor baseline EEG."
-    else:
-        prediction_text = "Your EEG is predicted to be healthy baseline EEG."
+    predictions = []
+    for label in y_pred_labels:
+        if label == 0:
+            prediction_text = "Your EEG is predicted to be tumor-induced seizure EEG."
+        elif label == 1:
+            prediction_text = "Your EEG is predicted to be tumor baseline EEG."
+        else:
+            prediction_text = "Your EEG is predicted to be healthy baseline EEG."
+        predictions.append(prediction_text)
 
-    return {"prediction": prediction_text}
+    return {"predictions": predictions}
 
 
 
