@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 from keras.models import load_model
-from packagename.encoding_03 import encoder_LSTM
+from EEG.encoding_03 import encoder_LSTM
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
