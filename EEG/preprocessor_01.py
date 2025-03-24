@@ -13,8 +13,6 @@ def preprocess_data(data: pd.DataFrame, data_path) -> pd.DataFrame:
     - taking only columns we need
     """
 
-
-
    # (1) getting rid of not-needed column
     if 'Unnamed' in data.columns:
         data.drop(columns=['Unnamed'], inplace=True)
@@ -28,6 +26,8 @@ def preprocess_data(data: pd.DataFrame, data_path) -> pd.DataFrame:
     print(f"✅ Data preprocessed and saved to: {data_path}")
     return data
 
+###########################################
+##########################################
 
 if __name__ == "__main__":
 

@@ -50,21 +50,16 @@ def test_train_split_save(X: pd.DataFrame ,y: pd.DataFrame,output_path) -> pd.Da
     return X_train, X_test, y_train, y_test, random_test_samples
 
 
+
+###########################################
+##########################################
+
 if __name__ == "__main__":
-
-    #######################################################################
-    ####### Loading data  from preprocessor.py ####################
-    ####### Splitting into train/test here########################
-    ######################################################################
-
-    input_path = "./raw_data"
-    file_name = "Epileptic Seizure Recognition.csv"
-    file_path = os.path.join(input_path, file_name)
 
     output_path = "./processed_data"
     data_file = "data.csv"
     data_path = os.path.join(output_path, data_file)
-    data = pd.read_csv(file_path)
+    data = pd.read_csv(data_path)
 
     data = preprocess_data(data, data_path)
     X = data.drop(columns = 'y')
@@ -72,3 +67,5 @@ if __name__ == "__main__":
 
     # calling function test_train_split_save(X,y)
     X_train, X_test, y_train, y_test, random_test_samples = test_train_split_save(X,y,output_path)
+
+    print("✅ Data split into (X,y) and train/test/random-pred and saved as .csv")

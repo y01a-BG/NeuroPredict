@@ -13,6 +13,9 @@ from keras.optimizers import Adam
 from xgboost import XGBClassifier
 #from sklearn.model_selection import RandomizedSearchCV
 
+from sktime.classification.kernel_based import RocketClassifier
+from sktime.classification.shapelet_based import ShapeletTransformClassifier
+
 
 #****************************************************************#
 #****************************************************************#
@@ -20,7 +23,8 @@ from xgboost import XGBClassifier
 #   THIS .py CONTAINS MODELING FOR  DIFFERENT ML-models:
 #   1. LSTM
 #   2. XG Boost
-#   3.
+#   3.RocketClassifier (from sktime)
+#   4. ShapeletTransformClassifier (from sktime)
 #****************************************************************#
 #****************************************************************#
 #****************************************************************#
@@ -117,7 +121,7 @@ def initialize_xgb_model():
 
 
     ################################################################################
-    ##############   Above best params are the result of randomSearchCV below #######
+    ######  Above XGBoost best params are the result of randomSearchCV below #######
     ################################################################################
 
     ''''
@@ -144,18 +148,57 @@ def initialize_xgb_model():
         random_state=42
         )
     '''
+
+
+
+####################################################
+#################  MODEL    Rocket ##################
+######################################################
+
+def initialize_rocket_model():
+    clf = RocketClassifier(num_kernels=1000,
+                        rocket_transform='rocket',
+                        max_dilations_per_kernel=32,
+                        n_features_per_kernel=4,
+                        use_multivariate='auto',
+                        n_jobs=-1,
+                        random_state=None
+    )
+
+    return clf
+
+
+########################################################################
+#############      MODEL    ShapeletTransformClassifier  ###############
+################ THIS MODEL TAKES ~ 4h on GPU  #########################
+########################################################################
+
+def initialize_shapelet_model():
+    shapelet_class = ShapeletTransformClassifier(
+        n_shapelet_samples=1000,
+        max_shapelets=None, max_shapelet_length=None,
+        estimator=None, transform_limit_in_minutes=0,
+        time_limit_in_minutes=0,
+        save_transformed_data=False,
+        n_jobs=1, batch_size=100, random_state=None
+        )
+
+    return shapelet_class
+
+
+
 #################################################
 ######### if runing: python  modelin_04.py ######
 #################################################
 
 def initialize_models(model: str):
     """
-    This function will apply encoding based on the model choice (LSTM or XGBoost).
+    This function will apply encoding based on the model choice (LSTM ,XGBoost...).
 
     Parameters:
     - X_train: Input training data
     - y_train: Target training data
-    - model: A string indicating the model type ('LSTM' or 'XGBoost')
+    - model: A string indicating the model type ('LSTM', 'XGBoost', 'Rocket', 'Shapelet')
 
     Returns:
     - Encoded X_train and y_train based on the selected model.
@@ -173,10 +216,20 @@ def initialize_models(model: str):
         xgb_model = initialize_xgb_model()
         print("✅ XGBoost Model initialized")
         return xgb_model
+    elif model == "Rocket":
+        rocket_model = initialize_rocket_model()
+        print("✅ Rocket Model initialized")
+        return rocket_model
+    elif model == "Shapelet":
+        shapelet_model = initialize_shapelet_model()
+        print("✅ Shapelet Model initialized")
+        return shapelet_model
     else:
-        print(f"Unknown model: {model}. Please choose either 'LSTM' or 'XGBoost'.")
+        print(f"Unknown model: {model}. Please choose either: 'LSTM', 'XGBoost', 'Rocket', 'Shapelet'")
 
 
 if __name__ == "__main__":
     #lstm_model = initialize_models('LSTM')
     xgb_model_out = initialize_models('XGBoost')
+    #rocket_model_out = initialize_models('Rocket')
+    #shapelet_model_out = initialize_models('Shapelet')

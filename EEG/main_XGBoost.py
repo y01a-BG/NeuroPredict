@@ -3,18 +3,19 @@ import pandas as pd
 import numpy as np
 import xgboost as xgb
 
+from sklearn.model_selection import train_test_split
 
 from preprocessor_01 import preprocess_data
-from test_and_train_split_02 import test_train_split_save
+from EEG.X_y_test_train_rand_02 import test_train_split_save
 from encoding_03 import encoder_XGBoost
 from modeling_04 import initialize_xgb_model
 from training_05 import train_xgb_model
 from evaluating_06 import evaluate_xgbmodel
 #from predictor_07 import pred_xgb
 
-input_path = "./raw_data"
-file_name = "Epileptic Seizure Recognition.csv"
-file_path = os.path.join(input_path, file_name)
+from xgboost import XGBClassifier
+
+
 
 input_path = "./raw_data"
 file_name = "Epileptic Seizure Recognition.csv"
@@ -42,17 +43,19 @@ X_train, X_test, y_train, y_test, random_test_samples = test_train_split_save(X,
 
 #### encoding_03 for XGBoost
 X_train,y_train = encoder_XGBoost(X_train,y_train)
-X_train = encoder_XGBoost(X_train)
+X_test, y_test = encoder_XGBoost(X_test, y_test)
 
 ### modeling_04 for XGBoost
-input_shape = (178,1)
-model_xgb = initialize_xgb_model()
+xgb = initialize_xgb_model()
+
+# Validation data need to be given explicitely: split the data into training and validation sets
+X_train1, X_val, y_train1, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
 
 ##### training_05
-best_xgb = train_xgb_model(X_train,y_train)
+XGBmodel = train_xgb_model(X_train1, X_val, y_train1, y_val, xgb)
 
 # Save XBGoost  trained model
-best_xgb.save_model("models/XGBoost_model.json")
+XGBmodel.save_model("./models/XGBmodel.json")
 
 # evaluating_06
 results_df = evaluate_xgbmodel(X_test, y_test)
