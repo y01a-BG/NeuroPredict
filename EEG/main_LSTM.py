@@ -4,16 +4,12 @@ import pandas as pd
 import numpy as np
 
 from preprocessor_01 import preprocess_data
-from test_and_train_split_02 import test_train_split_save
+from X_y_test_train_rand_02 import test_train_split_save
 from encoding_03 import encoder_LSTM
 from modeling_04 import initialize_lstm_model, compile_lstm_model
 from training_05 import train_lstm_model
 from evaluating_06 import evaluate_lstm
 #from predictor_07 import pred_lstm
-
-input_path = "./raw_data"
-file_name = "Epileptic Seizure Recognition.csv"
-file_path = os.path.join(input_path, file_name)
 
 input_path = "./raw_data"
 file_name = "Epileptic Seizure Recognition.csv"
@@ -33,8 +29,7 @@ X_pred = pd.read_csv(X_pred_file_path)
 data = preprocess_data(data, data_path)
 X = data.drop(columns = 'y')
 y = data.y
-
-print(f"✅ Data preprocessed and split to (X,y)")
+print(f"✅ Raw data cleaned and separated (X,y)")
 
 
 ####### test_and_train_split_02
@@ -42,7 +37,7 @@ X_train, X_test, y_train, y_test, random_test_samples = test_train_split_save(X,
 
 #### encoding_03 for LSTM
 X_train,y_train = encoder_LSTM(X_train,y_train)
-X_train = encoder_LSTM(X_train)
+X_test, y_test = encoder_LSTM(X_test, y_test)
 
 ### modeling_04 for LSTM
 input_shape = (178,1)

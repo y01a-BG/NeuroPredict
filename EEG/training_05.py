@@ -3,16 +3,24 @@ import pandas as pd
 import numpy as np
 
 from modeling_04 import initialize_lstm_model, compile_lstm_model, initialize_xgb_model
-from encoding_03 import encoder_LSTM, encoder_XGBoost
+from modeling_04 import initialize_rocket_model, initialize_shapelet_model
+from encoding_03 import encoder_LSTM, encoder_XGBoost, from_2d_array_to_nested
 from sklearn.model_selection import train_test_split
 
 import tensorflow as tf
 from keras import callbacks
 from keras.callbacks import EarlyStopping
 
+from xgboost import XGBClassifier
+#from sklearn.model_selection import RandomizedSearchCV
+
+from sktime.classification.kernel_based import RocketClassifier
+from sktime.classification.shapelet_based import ShapeletTransformClassifier
+
 
 from colorama import Fore, Style
 from typing import Tuple
+import joblib
 
 
 
@@ -22,7 +30,8 @@ from typing import Tuple
 #   THIS .py CONTAINS training FOR  DIFFERENT ML/DL -models:
 #   1. LSTM
 #   2. XG Boost
-#   3.
+#   3. RocketClassifier (sktime)
+#   4. ShapeletTransformerClassifier (sktime)
 #****************************************************************#
 #****************************************************************#
 #****************************************************************#
@@ -39,10 +48,7 @@ def utils_lstm(input_shape = (178,1)):
     # Calling the compiled model from modeling_03.py
     model = initialize_lstm_model(input_shape)
     model = compile_lstm_model(model, learning_rate=0.001)
-
     return X_train_enc, y_train_enc, model
-
-
 
 ### Define function to TRAIN the model  #################
 
@@ -93,21 +99,56 @@ def train_lstm_model(
 
 ## Training the model (Early Stopping and best model is included in .fit() in XGBoost)
 
-def train_xgb_model(X_train,y_train):
-
+def utils_xgb(X_train, y_train):
+    # encoding data for XGBoost
+    X_train_enc, y_train_enc = encoder_XGBoost(X_train, y_train)
     # Validation data need to be given explicitely: split the data into training and validation sets
-    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
+    X_train1, X_val, y_train1, y_val = train_test_split(X_train_enc, y_train_enc, test_size=0.2, random_state=42)
     ####Initializing the model from modeling_04
     xgb = initialize_xgb_model()
-    best_xgb = xgb.fit(
-        X_train,y_train,
-        eval_set=[(X_train,y_train), (X_val, y_val)],
+    return X_train1, X_val, y_train1, y_val, xgb
+
+
+def train_xgb_model(X_train1, X_val, y_train1, y_val, xgb):
+    xgb.fit(
+        X_train1, y_train1,
+        eval_set=[(X_train1, y_train1), (X_val, y_val)],
         verbose=True
     )
+    return xgb
+
     print(f"✅ XGBoost Model trained")
+    return xgb
 
-    return best_xgb
+#######################################################################
+#################### RocketClassifier model ###########################
+######################################################################
 
+def utils_rocket(X_train):
+    X_train_enc = from_2d_array_to_nested(X_train)
+    rocket_model = initialize_rocket_model()
+    return X_train, rocket_model
+
+
+def train_rocket_model(X_train_enc, y_train, rocket_model):
+    rocket_model.fit(X_train_enc, y_train)
+    return rocket_model
+
+
+#######################################################################
+################ ShapeletTransformClassifier model ####################
+################ THIS MODEL TAKES ~ 4h on GPU  ########################
+#######################################################################
+
+def utils_shapelet(X_train):
+    X_train_enc = from_2d_array_to_nested(X_train)
+    shapelet_model = initialize_shapelet_model()
+    return X_train_enc, shapelet_model
+
+
+def train_shapelet_model(X_train_enc, y_train,shapelet_model):
+    shapelet_model.fit(X_train_enc, y_train)
+    return shapelet_model
 
 
 
@@ -122,7 +163,7 @@ def training_models(X_train,y_train,model: str):
     Parameters:
     - X_train: Input training data
     - y_train: Target training data
-    - model: A string indicating the model type ('LSTM' or 'XGBoost')
+    - model: A string indicating the model type ('LSTM', 'XGBoost',....)
 
     Returns:
     - Encoded X_train and y_train based on the selected model.
@@ -143,14 +184,28 @@ def training_models(X_train,y_train,model: str):
 
 
     elif model == "XGBoost":
-        # Encoding the data for XGBoost; this is StandardScaler - output data are np.array
-        X_train, y_train = encoder_XGBoost(X_train, y_train)
-        xgb = train_xgb_model(X_train, y_train)
+        X_train1, X_val, y_train1, y_val, xgb = utils_xgb(X_train, y_train)
+        xgb = train_xgb_model(X_train1, X_val, y_train1, y_val, xgb)
         #best_xgb.save("models/XGBoost_model.h5")
         print("✅ XGBoost Model trained on (X_train, y_train)")
         return xgb
+
+    elif model == "Rocket":
+        X_train_enc, clf = utils_rocket(X_train)
+        rocket_model = train_rocket_model(X_train_enc, y_train, rocket_model)
+        #joblib.dump(rocket_model, "rocket_model.pkl")
+        print("✅ Rocket Model trained on (X_train, y_train)")
+        return rocket_model
+
+    elif model == "Shapelet":
+        X_train_enc, clf = utils_shapelet(X_train)
+        shapelet_model = train_shapelet_model(X_train_enc, y_train, shapelet_model)
+        #joblib.dump(rocket_model, "shapelet_model.pkl")
+        print("✅ Shapelet Model trained on (X_train, y_train)")
+        return shapelet_model
+
     else:
-        print(f"Unknown model: {model}. Please choose either 'LSTM' or 'XGBoost'.")
+        print(f"Unknown model: {model}. Please choose either 'LSTM', 'XGBoost, 'Rocket, 'ShapeletTransform")
 
 
 
@@ -173,3 +228,5 @@ if __name__ == "__main__":
     #calling the function
     #lstm_model = training_models(X_train,y_train,'LSTM')
     xgb_model = training_models(X_train,y_train,'XGBoost')
+    #rocket_model = training_models(X_train,y_train,'Rocket')
+    #rocket_model = training_models(X_train,y_train,'Shapelet')
