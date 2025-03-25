@@ -15,7 +15,7 @@ from sklearn.metrics import classification_report
 ###########################################
 
 # Load trianed model from model/ .h5 file
-lstm = load_model("./models/LSTMmodel.h5")
+lstm = load_model("./models/model_lstm.h5")
 binary_rocket = joblib.load("./models/binary_rocket.pkl")
 
 ####################################################
