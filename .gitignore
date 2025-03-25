@@ -31,13 +31,14 @@ data/
 
 # Any pickle files
 *.pckl
-*.pkl
+#*.pkl
 
 # Credentials (or files with potentially credentials inside)
 .env
 .env.yaml
 .credentials
 secrets.toml
+#*.json
 
 # User defined extras
 # Complete to your desire
