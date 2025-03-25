@@ -40,5 +40,6 @@ Dockerfile
 docker-compose.yml
 
 # Project specific
-models/
-health_data.csv 
+health_data.csv
+raw_data/
+processed_data/
