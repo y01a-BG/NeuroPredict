@@ -31,8 +31,8 @@ models/
 # *.h5
 
 # Any pickle files
-#*.pickle
-#*.pckl
+*.pickle
+*.pckl
 #*.pkl
 
 # Credentials (or files with potentially credentials inside)
