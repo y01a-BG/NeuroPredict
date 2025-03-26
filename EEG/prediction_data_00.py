@@ -36,6 +36,7 @@ def prediction_data(data: pd.DataFrame, exclude_colums: list = [4,5]) -> pd.Data
     # Remove the selected rows from the original dataset
     data = data.drop(prediction_data.index)
 
+
     # Save the modified dataset and prediction data
     output_path = "./processed_data"
     data_file_name = "data.csv"

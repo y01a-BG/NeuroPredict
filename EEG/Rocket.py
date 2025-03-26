@@ -151,3 +151,41 @@ print(f"✅ Metrics Table:{results_df}")
 
 # Save Rocket  trained model
 joblib.dump(rocket, "./models/model_rocket.pkl")
+
+
+#######################################################################
+#################### Predicting with  RocketClassifier ###############
+######################################################################
+
+output_path = "./processed_data"
+pred_file = "prediction_data.csv"
+pred_path = os.path.join(output_path, pred_file)
+data_pred = pd.read_csv(pred_path)
+
+X_pred = data_pred.drop(columns = 'y')
+y_pred= data_pred.y
+print(f"✅ Prediction data separated (X,y)")
+
+X_pred_enc = from_2d_array_to_nested(X_pred,
+                                index=None, columns=None, time_index=None,
+                                cells_as_numpy=False
+                    )
+
+
+y_pred = rocket.predict(X_pred_enc)
+
+predictions = []
+for label in y_pred:
+    if label == 0:
+        prediction_text = "Your EEG is predicted to be tumor-induced seizure EEG."
+        predictions.append(prediction_text)
+    elif label == 1:
+        prediction_text = "Your EEG is predicted to be tumor baseline EEG."
+        predictions.append(prediction_text)
+    else:
+        prediction_text = "Your EEG is predicted to be healthy baseline EEG."
+        predictions.append(prediction_text)
+
+
+pred_dictionary = {"predictions": predictions}
+print(f'✅ Prediction results for 6 EEG samples are : {pred_dictionary}')

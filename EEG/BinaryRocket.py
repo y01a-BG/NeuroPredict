@@ -7,8 +7,10 @@ import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 from sktime.classification.kernel_based import RocketClassifier
+from sktime.transformations.panel.rocket import MiniRocket
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from sklearn.metrics import classification_report
+from sklearn.preprocessing import StandardScaler
 
 
 
@@ -58,6 +60,9 @@ y_test.to_csv(y_test_output_file, index=False)
 print("✅ Data split into train/test and saved as .csv")
 
 
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 ###############################################################
 ##############   encoding_03  ################################
 ##############################################################
@@ -98,13 +103,15 @@ print("✅ X_train is encoded for RocketClassifier.")
 #################  MODEL    Rocket ##################
 ######################################################
 
-rocket = RocketClassifier(num_kernels=1000,
+
+
+rocket = RocketClassifier(num_kernels=2000,
                         rocket_transform='rocket',
-                        max_dilations_per_kernel=32,
-                        n_features_per_kernel=4,
+                        max_dilations_per_kernel=8,
+                        n_features_per_kernel=8,
                         use_multivariate='auto',
                         n_jobs=-1,
-                        random_state=None
+                        random_state=42
     )
 
 
@@ -159,7 +166,49 @@ print(f"✅ Metrics Table:{results_df}")
 ######################################################################
 
 # Save Rocket  trained model
-joblib.dump(rocket, "./models/binary_rocket.pkl")
+#joblib.dump(rocket, "./models/binary_rocket.pkl")
+
+
+#######################################################################
+#################### Predicting with  RocketClassifier ###############
+######################################################################
+
+output_path = "./processed_data"
+pred_file = "prediction_data.csv"
+pred_path = os.path.join(output_path, pred_file)
+data_pred = pd.read_csv(pred_path)
+
+#Exclude seasure, leave only 2,3
+data_pred = data_pred[~data_pred['y'].isin([1])]
+X_pred = data_pred.drop(columns = 'y')
+y_pred_original = data_pred.y
+print(f"✅ Prediction data separated (X,y)")
+
+X_pred_enc = from_2d_array_to_nested(X_pred,
+                                index=None, columns=None, time_index=None,
+                                cells_as_numpy=False
+                    )
+
+
+y_pred = rocket.predict(X_pred_enc)
+
+predictions = []
+for label in y_pred:
+    if label == 0:
+        prediction_text = "Your EEG is predicted to be tumor-induced seizure EEG."
+        predictions.append(prediction_text)
+    elif label == 1:
+        prediction_text = "Your EEG is predicted to be tumor baseline EEG."
+        predictions.append(prediction_text)
+    else:
+        prediction_text = "Your EEG is predicted to be healthy baseline EEG."
+        predictions.append(prediction_text)
+
+
+pred_dictionary = {"predictions": predictions}
+print(f'✅ Prediction results for 6 EEG samples are : {pred_dictionary}')
+
+
 
 
 ##########################################################################
@@ -167,32 +216,32 @@ joblib.dump(rocket, "./models/binary_rocket.pkl")
 #########################################################################
 #Learning curve
 
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.model_selection import learning_curve
+# import matplotlib.pyplot as plt
+# import numpy as np
+# from sklearn.model_selection import learning_curve
 
-# Compute learning curve
-train_sizes, train_scores, test_scores = learning_curve(
-    rocket, X_test_enc, y_train, cv=5, scoring="accuracy", n_jobs=-1, train_sizes=np.linspace(0.1, 1.0, 10)
-)
+# # Compute learning curve
+# train_sizes, train_scores, test_scores = learning_curve(
+#     rocket, X_test_enc, y_train, cv=5, scoring="accuracy", n_jobs=-1, train_sizes=np.linspace(0.1, 1.0, 10)
+# )
 
-# Compute mean and std
-train_mean = np.mean(train_scores, axis=1)
-train_std = np.std(train_scores, axis=1)
-test_mean = np.mean(test_scores, axis=1)
-test_std = np.std(test_scores, axis=1)
+# # Compute mean and std
+# train_mean = np.mean(train_scores, axis=1)
+# train_std = np.std(train_scores, axis=1)
+# test_mean = np.mean(test_scores, axis=1)
+# test_std = np.std(test_scores, axis=1)
 
-# Plot learning curve
-plt.figure(figsize=(8, 6))
-plt.plot(train_sizes, train_mean, 'o-', label="Train Accuracy", color="blue")
-plt.plot(train_sizes, test_mean, 'o-', label="Test Accuracy", color="red")
+# # Plot learning curve
+# plt.figure(figsize=(8, 6))
+# plt.plot(train_sizes, train_mean, 'o-', label="Train Accuracy", color="blue")
+# plt.plot(train_sizes, test_mean, 'o-', label="Test Accuracy", color="red")
 
-plt.fill_between(train_sizes, train_mean - train_std, train_mean + train_std, color="blue", alpha=0.1)
-plt.fill_between(train_sizes, test_mean - test_std, test_mean + test_std, color="red", alpha=0.1)
+# plt.fill_between(train_sizes, train_mean - train_std, train_mean + train_std, color="blue", alpha=0.1)
+# plt.fill_between(train_sizes, test_mean - test_std, test_mean + test_std, color="red", alpha=0.1)
 
-plt.xlabel("Training Set Size")
-plt.ylabel("Accuracy")
-plt.title("Learning Curve: Train vs Test Accuracy")
-plt.legend()
-plt.grid()
-plt.show()
+# plt.xlabel("Training Set Size")
+# plt.ylabel("Accuracy")
+# plt.title("Learning Curve: Train vs Test Accuracy")
+# plt.legend()
+# plt.grid()
+# plt.show()
