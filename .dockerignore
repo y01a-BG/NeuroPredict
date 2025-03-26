@@ -42,4 +42,3 @@ docker-compose.yml
 # Project specific
 health_data.csv
 raw_data/
-processed_data/
