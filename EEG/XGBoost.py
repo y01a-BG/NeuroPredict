@@ -171,7 +171,7 @@ xgb.save_model("./models/model_xgb.json")
 ######################################################################
 
 input_path = "./processed_data"
-X_pred_file_name = "random_test_samples.csv"
+X_pred_file_name = "prediction_data.csv"
 X_pred_file_path = os.path.join(input_path, X_pred_file_name)
 X_pred = pd.read_csv(X_pred_file_path)
 

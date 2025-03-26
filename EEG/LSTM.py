@@ -74,42 +74,99 @@ print(f"✅ Train data encoded for LSTM, with X_train shape : {X_train_enc.shape
 ################### MODEL LSTM  modeling_04 ##########
 #####################################################
 
-#Bidirectional LSTM model
-input_shape = (178,1)
+# Suggested by ChatGTP
+from keras.models import Sequential
+from keras.layers import LSTM, Dense, BatchNormalization, Dropout
+
+input_shape = (178, 1)  # EEG input shape
+
 model = Sequential()
 
-# First Bidirectional LSTM layer with L2 regularization
-model.add(Bidirectional(LSTM(128, activation='tanh',
-                            return_sequences=True,
-                            kernel_regularizer='l2'),
-                            input_shape=input_shape)
-          )
-
+# Reduce LSTM layers & units
+model.add(LSTM(64, activation='tanh', return_sequences=True, input_shape=input_shape))
 model.add(BatchNormalization())
-model.add(Dropout(0.3))
+model.add(Dropout(0.4))  # Increase dropout
 
-# Second Bidirectional LSTM layer with L2 regularization
-model.add(Bidirectional(LSTM(128, activation='tanh',
-                             return_sequences=True,
-                            kernel_regularizer='l2')))
+model.add(LSTM(32, activation='tanh'))
 model.add(BatchNormalization())
-model.add(Dropout(0.3))
+model.add(Dropout(0.4))
 
-# Third LSTM layer with fewer units and L2 regularization
-model.add(LSTM(64, activation='tanh', kernel_regularizer='l2'))
-model.add(BatchNormalization())
-model.add(Dropout(0.3))
+# Dense layers
+model.add(Dense(32, activation='relu'))
+model.add(Dropout(0.4))
+model.add(Dense(3, activation='softmax'))  # 3 classes
 
-# Dense layer with ReLU activation
-model.add(Dense(64, activation='relu'))
+# Compile with lower learning rate
+learning_rate = 0.0005  # Reduce LR for stability
+optimizer = Adam(learning_rate=learning_rate)
 
-# Output layer with softmax activation for multi-class classification
-model.add(Dense(3, activation='softmax'))
+model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=["accuracy"])
 
-# Compile the model with the Adam optimizer and sparse categorical cross-entropy loss
-model.compile(optimizer=Adam(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
+print("✅ Optimized LSTM Model initialized")
 
-print("✅ Improved LSTM Model1 initialized")
+
+# # #Basic LSTM Andy
+# input_shape = (178,1)
+# model = Sequential()
+
+# model.add(LSTM(128, activation='tanh', return_sequences=True, input_shape=input_shape))
+# model.add(BatchNormalization())
+# model.add(Dropout(0.3))
+
+# model.add(LSTM(128, activation='tanh', return_sequences=True))
+# model.add(BatchNormalization())
+# model.add(Dropout(0.3))
+
+
+# model.add(LSTM(64, activation='tanh'))
+# model.add(BatchNormalization())
+# model.add(Dropout(0.3))
+
+# model.add(Dense(64, activation='relu'))
+# model.add(Dense(3, activation='softmax'))
+
+# print("✅ LSTM Model initialized")
+
+# learning_rate = 0.001
+# optimizer = Adam(learning_rate=learning_rate) # 'rmsprop'
+# model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=["accuracy"])
+
+# print("✅ LSTM Model compiled")
+
+# # First Bidirectional LSTM layer with L2 regularization
+# input_shape = (178,1)
+# model = Sequential()
+# model.add(Bidirectional(LSTM(128, activation='tanh',
+#                             return_sequences=True,
+#                             kernel_regularizer='l2'),
+#                             input_shape=input_shape)
+#           )
+
+# model.add(BatchNormalization())
+# model.add(Dropout(0.3))
+
+# # Second Bidirectional LSTM layer with L2 regularization
+# model.add(Bidirectional(LSTM(128, activation='tanh',
+#                              return_sequences=True,
+#                             kernel_regularizer='l2')))
+# model.add(BatchNormalization())
+# model.add(Dropout(0.3))
+
+# # Third LSTM layer with fewer units and L2 regularization
+# model.add(LSTM(64, activation='tanh', kernel_regularizer='l2'))
+# model.add(BatchNormalization())
+# model.add(Dropout(0.3))
+
+# # Dense layer with ReLU activation
+# model.add(Dense(64, activation='relu'))
+
+# # Output layer with softmax activation for multi-class classification
+# model.add(Dense(3, activation='softmax'))
+
+# # Compile the model with the Adam optimizer and sparse categorical cross-entropy loss
+# model.compile(optimizer=Adam(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
+
+# print("✅ Improved LSTM Model1 initialized")
 
 #####################################################
 ################### Fitting LSTM  training_05 ########
@@ -127,7 +184,7 @@ history = model.fit(
         X_train_enc,y_train_enc,
         validation_split=0.2,
         epochs=50,
-        batch_size=64,
+        batch_size=32,  #128
         callbacks=[es],
         verbose=1
     )
@@ -151,6 +208,10 @@ y_pred_probs = model.predict(X_test_enc)
 # Convert probabilities to class labels (index of the max probability)
 y_pred_labels = np.argmax(y_pred_probs, axis=1)
 y_test_labels = np.argmax(y_test_enc, axis=1)
+
+# Debug
+print(f"Unique values in y_lstm_preds before conversion: {np.unique( y_pred_labels)}")
+print(f'Classes population after lstm : {pd.DataFrame(y_pred_labels).value_counts()}')
 
 # Calculate accuracy score
 accuracy = accuracy_score(y_test_labels, y_pred_labels)
@@ -182,7 +243,7 @@ print(f"✅ Metrics Table:{results_df}")
  ############################################
 
 
-model.save("models/model_lstm.h5")
+model.save("./models/model_lstm.h5")
 print(f"✅  LSTM model saved")
 
 
@@ -191,7 +252,7 @@ print(f"✅  LSTM model saved")
 #####################################################
 
 input_path = "./processed_data"
-X_pred_file_name = "random_test_samples.csv"
+X_pred_file_name = "prediction_data.csv"
 X_pred_file_path = os.path.join(input_path, X_pred_file_name)
 X_pred = pd.read_csv(X_pred_file_path)
 
