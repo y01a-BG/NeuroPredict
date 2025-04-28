@@ -88,7 +88,7 @@ cd api
 uvicorn app:app --reload
 ```
 
-The API will be available at http://127.0.0.1:8000
+The App is available at https://neuropredictor.streamlit.app/
 
 ### Starting the Frontend
 
