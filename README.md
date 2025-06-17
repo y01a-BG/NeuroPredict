@@ -1,214 +1,327 @@
 # NeuroPredict: EEG-Based Tumor and Seizure Classification
 
+This repository is a **monorepo** comprising both the model backend and the web-based frontend for NeuroPredict, a tool for classifying EEG signals to predict tumor and seizure activity. It combines all relevant information, dependencies, and instructions from both the FastAPI/Streamlit model backend (`y01a-BG/NeuroPredict`) and the standalone Streamlit app (`fglaw/NeuroPredictFrontend`). This README provides accurate, actionable steps to seamlessly fork, set up, and run the entire project.
+
+---
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Objective](#objective)
+- [Dataset](#dataset)
+- [Project Structure](#project-structure)
+- [Functionality](#functionality)
+- [Running the Application](#running-the-application)
+- [Dependencies & Environment](#dependencies--environment)
+  - [Backend (API)](#backend-api)
+  - [Frontend (Streamlit)](#frontend-streamlit)
+  - [Development/Notebook Environment](#developmentnotebook-environment)
+- [Docker Usage](#docker-usage)
+- [How to Use](#how-to-use)
+- [Future Enhancements](#future-enhancements)
+- [References](#references)
+
+---
+
 ## Project Overview
 
-This project aims to develop a machine learning classification model to predict the presence of tumors and seizure occurrences based on EEG (electroencephalogram) data. By leveraging advanced machine learning and deep learning techniques, the project seeks to create an accurate, ethical, and explainable predictive tool for clinical use.
+NeuroPredict is a machine learning platform designed to assist in medical diagnosis by classifying EEG (electroencephalogram) data into clinically relevant categories: healthy baseline, tumor baseline, and tumor-induced seizure. The platform consists of:
+
+- **Backend:** FastAPI service for prediction and data processing.
+- **Frontend:** Streamlit app for data upload, visualization, and prediction display.
+- **Jupyter Notebooks:** For model development, data exploration, and reproducible research.
+
+---
 
 ## Objective
-- Classify EEG signals into distinct medical states:
-  - Healthy baseline
-  - Tumor baseline
-  - Tumor-induced seizure
+
+- Classify EEG signals into:
+  - **Healthy baseline**
+  - **Tumor baseline**
+  - **Tumor-induced seizure**
+
+---
 
 ## Dataset
-The dataset used for this project is derived from the [Epileptic Seizure Recognition](https://www.kaggle.com/datasets/harunshimanto/epileptic-seizure-recognition/data) dataset provided on Kaggle.
 
-### Data Description:
-- 500 subjects
-- 4097 EEG data points per individual (23.5 seconds recording)
-- Data reshaped into 23 segments per individual (each chunk: 178 data points)
-- Labels:
-  - 1: Recording of seizure activity
-  - 2: EEG from tumor-affected areas
-  - 3: EEG from healthy areas adjacent to tumors
-  - 4: Healthy baseline (tumor patient)
-  - 5: Eyes open baseline (healthy patient)
+- Source: [Epileptic Seizure Recognition (Kaggle)](https://www.kaggle.com/datasets/harunshimanto/epileptic-seizure-recognition/data)
+- **Description:**
+  - 500 subjects, each with 4097 EEG data points (23.5 seconds)
+  - Data is reshaped into 23 segments per individual (178 data points each)
+  - Labels:
+    - 1: Seizure activity
+    - 2: Tumor-affected area
+    - 3: Healthy area adjacent to tumor
+    - 4: Healthy baseline (tumor patient)
+    - 5: Eyes open baseline (healthy patient)
+
+---
 
 ## Project Structure
 
 ```
-project/
-├── api/
-│   ├── app.py         # FastAPI backend for EEG data processing and prediction
-│   └── fast.py        # Additional API functionality
-├── frontend/
-│   └── app.py         # Streamlit frontend for visualization
+project-root/
+├── api/                # FastAPI backend
+│   ├── app.py
+│   └── fast.py
+├── frontend/           # Streamlit frontend
+│   └── app.py
 ├── models/
-│   └── LSTMmodel.h5   # Pre-trained LSTM neural network model
+│   └── LSTMmodel.h5    # Pre-trained model
 ├── packagename/
-│   └── encoding_03.py # Data preprocessing utilities
+│   └── encoding_03.py  # Data preprocessing
+├── notebooks/          # Data exploration & dev
+├── requirements.txt    # Main dependencies
+├── requerments_dev.txt # Dev & notebook dependencies
+├── Dockerfile
+├── Makefile
 └── README.md
 ```
 
-## Current Functionality
+---
+
+## Functionality
 
 ### Backend (FastAPI)
 
-The FastAPI backend provides an API for processing EEG data CSV files and making predictions using a pre-trained LSTM model:
-
-- **CSV Upload Endpoint**: Accepts CSV files containing EEG data
-- **Data Preprocessing**: Automatically preprocesses uploaded data using the encoder_LSTM function
-- **Model Prediction**: Uses the pre-trained LSTM model to classify EEG signals
-- **Response**: Returns prediction results with classifications (healthy baseline, tumor baseline, or tumor-induced seizure)
+- **/upload** endpoint: Accepts CSV uploads of EEG data.
+- **Preprocessing:** Uses `encoder_LSTM` for input transformation.
+- **Prediction:** Loads and uses `LSTMmodel.h5` for classification.
+- **Response:** Returns structured predictions (healthy, tumor, seizure).
 
 ### Frontend (Streamlit)
 
-The Streamlit frontend provides a user-friendly interface for:
+- **CSV Upload:** Users can upload EEG CSV files.
+- **Visualization:** Shows time-series plots for the first 6 rows.
+- **Prediction Display:** Results are color-coded:
+  - Green: Healthy baseline
+  - Yellow: Tumor baseline
+  - Red: Tumor-induced seizure
 
-- **CSV File Upload**: Easy upload of EEG data files
-- **Data Preview**: Shows a preview of the uploaded data
-- **API Integration**: Automatically sends data to the FastAPI backend for processing
-- **EEG Signal Visualization**: Displays the first 6 rows of data as time-series plots
-- **Prediction Display**: Shows color-coded predictions below each EEG signal:
-  - Green: Healthy baseline EEG
-  - Yellow: Tumor baseline EEG
-  - Red: Tumor-induced seizure EEG
+---
 
 ## Running the Application
 
 ### Prerequisites
 
-- Python 3.8+
-- Required libraries (install using `pip install -r requirements.txt`):
-  - fastapi
-  - uvicorn
-  - streamlit
-  - pandas
-  - numpy
-  - matplotlib
-  - keras
-  - tensorflow
-  - python-multipart
-  - requests
+- Python 3.8, 3.9, 3.10, or 3.11 (recommended: **3.10** for maximal compatibility)
+- pip (latest version highly recommended)
+- [Docker](https://docs.docker.com/get-docker/) (optional, for containerized runs)
 
-### Starting the Backend
+### Backend (API)
 
 ```bash
 cd api
+pip install -r ../requirements.txt
 uvicorn app:app --reload
 ```
+API will be available at `http://localhost:8000`.
 
-The App is available at https://neuropredictor.streamlit.app/
-
-### Starting the Frontend
+### Frontend (Streamlit)
 
 ```bash
-streamlit run frontend/app.py
+cd frontend
+pip install -r ../requirements.txt
+streamlit run app.py
 ```
+Streamlit app will be available at `http://localhost:8501`.
 
-The Streamlit interface will be available at http://127.0.0.1:8501
-
-### Using Docker
-
-If you prefer to use Docker:
+### Both Services (Docker Compose)
 
 ```bash
 docker-compose up --build
 ```
+- FastAPI: `http://localhost:8000`
+- Streamlit: `http://localhost:8501`
 
-This will start both the backend and frontend services.
-
-## How to Use
-
-1. Open the Streamlit frontend at http://127.0.0.1:8501
-2. Enter the FastAPI URL (default: http://127.0.0.1:8000)
-3. Upload a CSV file containing EEG data
-4. View the data preview and wait for automatic processing
-5. Examine the EEG signal visualizations and corresponding predictions
-6. Each prediction is color-coded to indicate the classification type
-
-## Future Enhancements
-
-- Improve model accuracy with advanced feature engineering
-- Add more detailed visualization options for EEG data
-- Implement real-time EEG monitoring capabilities
-- Add explainability features to help interpret predictions
-- Expand classification capabilities to detect more neurological conditions
-
-## References
-- Andrzejak et al., 2001. Indications of nonlinear deterministic and finite dimensional structures in brain activity.
-- Kode et al., 2024
+> **Note:** The public demo may be available at: https://neuropredictor.streamlit.app/
 
 ---
 
-**NeuroPredict** is dedicated to advancing medical diagnostics using cutting-edge AI techniques, ensuring explainability, ethics, and compliance with data privacy standards.
+## Dependencies & Environment
 
-## Project Components
+### Main Application (`requirements.txt`)
 
-### FastAPI Hello World Application
+These are the **minimum required versions** for production (API + Streamlit):
 
-A simple FastAPI Hello World application is included in the `api` directory.
+```text
+# API
+fastapi==0.110.0
+uvicorn==0.27.1
+starlette==0.36.3
+pydantic==2.10.6
+pandas==2.0.3
+python-multipart==0.0.9
+joblib==1.4.2
+sktime==0.36.0
+xgboost==3.0.0
+numba==0.61.0
 
-#### Running the FastAPI Application
+# Streamlit Frontend
+streamlit==1.32.0
+requests==2.31.0
+matplotlib==3.8.2
+plotly==5.9.0
+seaborn==0.13.1
+numpy==1.24.1
+setuptools==69.0.3
 
-##### Without Docker
+# ML/DL
+tensorflow-cpu==2.10.0
+keras==2.10.0
+```
 
-1. Install the required dependencies:
+**Important Version Notes:**
+- `pandas==2.0.3` (API) and `pandas==2.2.0` (frontend) are both referenced in the two repos; `2.0.3` is safest for backend, `2.2.0` works for frontend but ensure compatibility with other ML libs.
+- `numpy==1.24.1` (for notebooks, dev, and API); some notebook cells require `numpy<2.2`.
+- `tensorflow-cpu==2.10.0` and `keras==2.10.0` are standard for cross-platform compatibility.
+- `sktime`, `xgboost`, and `numba` are included for advanced time-series modeling and ML features.
+
+### Development/Notebook Environment (`requerments_dev.txt`)
+
+For running and reproducing Jupyter notebooks or contributing to model development:
+
+```text
+wheel
+nbresult
+colorama
+ipdb
+ipykernel
+yapf
+matplotlib
+pygeohash
+pytest
+seaborn
+xgboost
+numpy==1.24.1
+pandas==1.5.3
+scipy==1.10.0
+scikit-learn==1.3.1
+google-cloud-bigquery
+google-cloud-storage==2.14.0
+google-api-core==2.8.2
+googleapis-common-protos==1.56.4
+protobuf==3.19.6
+h5py==3.10.0
+db-dtypes
+pyarrow
+mlflow==2.1.1
+prefect==2.19.2
+python-dotenv
+psycopg2-binary
+fastapi==0.108.0
+pytz
+uvicorn
+httpx<0.28
+pytest-asyncio
+# For Mac (M1/M2): tensorflow-macos==2.10.0
+# For Mac (Intel): tensorflow==2.10.0
+# For Linux/Windows: tensorflow==2.10.0
+```
+
+> **Note:** For Mac with Apple Silicon, use `tensorflow-macos`; for all other platforms, use regular `tensorflow==2.10.0`.
+
+### Hardware/OS Notes
+
+- Works best on Linux or MacOS.
+- For GPU support, additional CUDA libraries are required (see TensorFlow docs).
+- For headless servers, use the `cpu` version of TensorFlow.
+
+---
+
+## Docker Usage
+
+A sample `Dockerfile` is included for production deployment:
+
+```dockerfile
+FROM python:3.10-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY api api
+COPY processed_data processed_data
+COPY EEG EEG
+COPY requirements.txt requirements.txt
+COPY models models
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expose port as needed (e.g., 8000 for API)
+```
+
+For cloud deployment (e.g., Google Cloud Run), see the included `Makefile`.
+
+---
+
+## How to Use
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/y01a-BG/NeuroPredict.git
+   cd NeuroPredict
+   ```
+
+2. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-2. Run the FastAPI application:
+3. **(Optional) Set up development environment:**
+   ```bash
+   pip install -r requerments_dev.txt
+   ```
+
+4. **Run backend (API):**
    ```bash
    cd api
    uvicorn app:app --reload
+   # Accessible at http://localhost:8000
    ```
 
-3. Access the API at:
-   - Main endpoint: http://localhost:8000/
-   - Hello endpoint: http://localhost:8000/hello/{name}
-   - API documentation: http://localhost:8000/docs
-
-##### With Docker
-
-1. Build and start the Docker container:
+5. **Run frontend (Streamlit):**
    ```bash
-   docker-compose up --build api
+   cd ../frontend
+   streamlit run app.py
+   # Accessible at http://localhost:8501
    ```
 
-2. Access the API at:
-   - Main endpoint: http://localhost:8000/
-   - Hello endpoint: http://localhost:8000/hello/{name}
-   - API documentation: http://localhost:8000/docs
-
-### Streamlit Frontend Application
-
-A simple Streamlit frontend application is included in the `frontend` directory.
-
-#### Running the Streamlit Application
-
-##### Without Docker
-
-1. Install the required dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. Run the Streamlit application:
-   ```bash
-   streamlit run frontend/app.py
-   ```
-
-3. Access the Streamlit app at:
-   - http://localhost:8501
-
-##### With Docker
-
-1. Build and start the Docker container:
-   ```bash
-   docker-compose up --build frontend
-   ```
-
-2. Access the Streamlit app at:
-   - http://localhost:8501
-
-### Running Both Services Together
-
-1. Build and start both the FastAPI and Streamlit containers:
+6. **Use Docker Compose for both:**
    ```bash
    docker-compose up --build
    ```
 
-2. Access the applications at:
-   - FastAPI: http://localhost:8000
-   - Streamlit: http://localhost:8501
+7. **Upload an EEG CSV file via the Streamlit app.**
+   The frontend will display visualizations and color-coded predictions.
+
+---
+
+## Future Enhancements
+
+- Improved model accuracy & feature engineering
+- More detailed EEG visualizations
+- Real-time EEG monitoring
+- Explainability and interpretability features
+- Expanded neurological condition detection
+
+---
+
+## References
+
+- Andrzejak et al., 2001. Indications of nonlinear deterministic and finite dimensional structures in brain activity.
+- Kode et al., 2024 (project contributors)
+- [Epileptic Seizure Recognition Dataset – Kaggle](https://www.kaggle.com/datasets/harunshimanto/epileptic-seizure-recognition/data)
+
+---
+
+**NeuroPredict** is dedicated to advancing AI-assisted medical diagnostics with a focus on explainability, ethics, and data privacy.
+
+---
+
+### For contributors
+
+- Please use branches for PRs.
+- For any questions about environment setup, see the [Dependencies & Environment](#dependencies--environment) section.
+- If you encounter installation errors (especially with pandas/numpy), ensure your `pip`, `setuptools`, and Python version are up-to-date and match the above specifications.
